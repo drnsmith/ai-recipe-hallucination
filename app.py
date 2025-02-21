@@ -1,8 +1,8 @@
 import gradio as gr
+from models import generate_recipe
+from prompts import prompt_options
 import os
 from dotenv import load_dotenv
-from models import generate_recipe
-from prompts import prompt_options  # Ensure this file exists!
 
 # ✅ Load API keys from .env
 load_dotenv()
@@ -12,36 +12,39 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
 MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY")
 
-# ✅ Print a masked confirmation (DO NOT print actual keys!)
+# ✅ Print API key status (DO NOT print actual keys!)
 print(f"🔑 OpenAI Key Loaded: {'✅' if OPENAI_API_KEY else '❌'}")
 print(f"🔑 Anthropic Key Loaded: {'✅' if ANTHROPIC_API_KEY else '❌'}")
 print(f"🔑 Mistral Key Loaded: {'✅' if MISTRAL_API_KEY else '❌'}")
 
+# ✅ Function to fetch AI-generated recipes from multiple models
+def compare_recipes(models, dish):
+    """Fetches AI-generated recipes from multiple selected models."""
+    results = {model: generate_recipe(model, dish) for model in models}
+    return results
 
-# ✅ Ensure `generate_recipe` returns a string response
-def ai_recipe_test(model, dish):
-    """Fetches AI-generated recipes and ensures valid output."""
-    response = generate_recipe(model, dish)
-    if not isinstance(response, str):
-        return "⚠️ Error: AI response is not a valid text!"
-    return response
-
-
-# ✅ Build Gradio UI
+# ✅ Build UI
 with gr.Blocks() as demo:
     gr.Markdown("# 🍽️ AI Recipe Hallucination Tester")
 
-    model_choice = gr.Radio(["GPT-4", "Claude", "Mixtral"], label="Choose AI Model")
+    # 🔹 Multi-select AI model checkbox
+    model_choice = gr.CheckboxGroup(["GPT-4", "Claude", "Mixtral"], label="Choose AI Models")
+
+    # 🔹 Dish selection dropdown
     dish_choice = gr.Dropdown(list(prompt_options.keys()), label="Select a Dish")
 
-    output = gr.Textbox(label="AI Response")
+    # 🔹 Display output as a dictionary (side-by-side model comparison)
+    output = gr.JSON(label="AI Responses")
 
     submit_btn = gr.Button("Generate Recipe")
-    submit_btn.click(ai_recipe_test, inputs=[model_choice, dish_choice], outputs=output)
 
-# ✅ Run the App
+    # 🔹 Run all selected models and show side-by-side results
+    submit_btn.click(compare_recipes, inputs=[model_choice, dish_choice], outputs=output)
+
+# ✅ Run App
 if __name__ == "__main__":
     demo.launch()
+
 
 
 
