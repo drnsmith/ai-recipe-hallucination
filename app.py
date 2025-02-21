@@ -1,6 +1,22 @@
 import gradio as gr
 from models import generate_recipe
 from prompts import prompt_options
+import os
+from dotenv import load_dotenv
+
+# ✅ Load API keys from .env
+load_dotenv()
+
+# ✅ Retrieve API keys securely
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
+MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY")
+
+# ✅ Print a masked confirmation (DO NOT print actual keys!)
+print(f"🔑 OpenAI Key Loaded: {'✅' if OPENAI_API_KEY else '❌'}")
+print(f"🔑 Anthropic Key Loaded: {'✅' if ANTHROPIC_API_KEY else '❌'}")
+print(f"🔑 Mistral Key Loaded: {'✅' if MISTRAL_API_KEY else '❌'}")
+
 
 # Gradio UI function
 def ai_recipe_test(model, dish):
