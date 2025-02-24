@@ -3,3 +3,5 @@ venv/
 cache/
 .env
 
+# Ignore shell config files
+.zshrc
